@@ -1,6 +1,6 @@
 import {Body} from "./body";
 import {Vector2} from "./vector2";
-import {getCircularOrbitalSpeed, getRandomInt, nrand} from "./utils";
+import {getCircularOrbitalSpeed, getRandomInt, nrand, randomRadian} from "./utils";
 
 export const CANVAS_WIDTH = window.innerWidth;
 export const CANVAS_HEIGHT = window.innerHeight;
@@ -25,11 +25,34 @@ let bodies: Body[] = [];
 let sunMass = 300000;
 bodies.push(new Body(sunMass, new Vector2(0, 0), new Vector2(0, 0), "yellow"));
 
-for(let i = 1; i < getRandomInt(2, 5); i++) {
-    let orbitRadius = 110 * i * nrand(1, 0.1);
-    let orbitalSpeed = getCircularOrbitalSpeed(sunMass, orbitRadius) * nrand(1, 0.1);
+for(let i = 1; i < getRandomInt(3, 5); i++) {
+    let orbitRadius = 90 * i * nrand(1, 0.1);
+    let orbitalSpeed = getCircularOrbitalSpeed(sunMass, orbitRadius) * nrand(1, 0.2);
     let mass = 20;
-    bodies.push(new Body(mass, new Vector2(0, orbitRadius), new Vector2(orbitalSpeed, 0)));
+
+    let orbitAngle = randomRadian();
+
+    let initialPosition = new Vector2(0, orbitRadius);
+    initialPosition.rotateInPlaceBy(orbitAngle);
+
+    let initialVelocity = new Vector2(orbitalSpeed, 0);
+    initialVelocity.rotateInPlaceBy(orbitAngle);
+
+    bodies.push(new Body(mass, initialPosition, initialVelocity));
+
+    /*for(let i = 0; i < 1; i++) {
+        let moonOrbitRadiusAroundEarth = 2;
+        let moonOrbitRadius = orbitRadius + moonOrbitRadiusAroundEarth;
+        let moonOrbitalSpeed = orbitalSpeed + getCircularOrbitalSpeed(mass, moonOrbitRadiusAroundEarth);
+
+        let initialSatellitePosition = new Vector2(0, moonOrbitRadius);
+        initialSatellitePosition.rotateInPlaceBy(orbitAngle);
+
+        let initialSatelliteVelocity = new Vector2(moonOrbitalSpeed, 0);
+        initialSatelliteVelocity.rotateInPlaceBy(orbitAngle);
+
+        bodies.push(new Body(0.01, initialSatellitePosition, initialSatelliteVelocity));
+    }*/
 }
 
 // EARTH

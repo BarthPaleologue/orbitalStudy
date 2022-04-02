@@ -4,6 +4,10 @@ export function getRandomInt(a: number, b: number) {
     return Math.floor(Math.random()*(b-a)+a);
 }
 
+export function randomRadian() {
+    return Math.random() * Math.PI * 2;
+}
+
 export function nrand(mean: number, std: number): number {
     // Box-Muller transform
     //https://www.baeldung.com/cs/uniform-to-normal-distribution

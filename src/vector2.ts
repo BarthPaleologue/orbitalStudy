@@ -30,6 +30,14 @@ export class Vector2 {
         this.y -= otherVector.y;
     }
 
+    public rotateInPlaceBy(theta: number) {
+        let nX = this.x * Math.cos(theta) - this.y * Math.sin(theta);
+        let nY = this.x * Math.sin(theta) + this.y * Math.cos(theta);
+
+        this.x = nX;
+        this.y = nY;
+    }
+
     public static DistanceSquared(vector1: Vector2, vector2: Vector2) {
         return (vector1.x - vector2.x)**2 + (vector1.y - vector2.y)**2;
     }

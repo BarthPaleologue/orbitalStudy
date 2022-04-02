@@ -1,7 +1,7 @@
 import {Vector2} from "./vector2";
 import {center} from "./index";
 
-let colors = ["red", "cyan", "green", "gray", "white"];
+let colors = ["red", "cyan", "green", "gray", "white", "purple", "brown", "teal"];
 
 export class Body {
     id: number;
