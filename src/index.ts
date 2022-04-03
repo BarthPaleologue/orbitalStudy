@@ -6,7 +6,7 @@ export const CANVAS_WIDTH = window.innerWidth;
 export const CANVAS_HEIGHT = window.innerHeight;
 export const center = new Vector2(CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2);
 
-export const G = 0.01;
+export const G = 0.0005;
 
 let renderCanvas = document.getElementById("renderCanvas") as HTMLCanvasElement;
 renderCanvas.width = CANVAS_WIDTH;
@@ -22,51 +22,32 @@ let traceCtx = traceCanvas.getContext("2d");
 let bodies: Body[] = [];
 
 // SUN
-let sunMass = 300000;
-bodies.push(new Body(sunMass, new Vector2(0, 0), new Vector2(0, 0), "yellow"));
+let sunMass = 2000000;
+let sun = new Body(sunMass, new Vector2(0, 0), new Vector2(0, 0), null,20,"yellow");
+bodies.push(sun);
 
 for(let i = 1; i < getRandomInt(3, 5); i++) {
-    let orbitRadius = 90 * i * nrand(1, 0.1);
-    let orbitalSpeed = getCircularOrbitalSpeed(sunMass, orbitRadius) * nrand(1, 0.2);
-    let mass = 20;
-
-    let orbitAngle = randomRadian();
+    let orbitRadius = 100 * i * nrand(1, 0.1);
+    let orbitalSpeed = getCircularOrbitalSpeed(sunMass, orbitRadius) * nrand(1, 0.1);
+    let mass = 20000 * nrand(1, 0.2);
 
     let initialPosition = new Vector2(0, orbitRadius);
-    initialPosition.rotateInPlaceBy(orbitAngle);
-
     let initialVelocity = new Vector2(orbitalSpeed, 0);
-    initialVelocity.rotateInPlaceBy(orbitAngle);
 
-    bodies.push(new Body(mass, initialPosition, initialVelocity));
+    let body = new Body(mass, initialPosition, initialVelocity, sun, 7);
+    bodies.push(body);
 
-    /*for(let i = 0; i < 1; i++) {
-        let moonOrbitRadiusAroundEarth = 2;
-        let moonOrbitRadius = orbitRadius + moonOrbitRadiusAroundEarth;
-        let moonOrbitalSpeed = orbitalSpeed + getCircularOrbitalSpeed(mass, moonOrbitRadiusAroundEarth);
+    for(let i = 0; i < 1; i++) {
+        let moonOrbitRadiusAroundEarth = 10 * nrand(1, 0.1);
+        let moonOrbitalSpeed = getCircularOrbitalSpeed(mass, moonOrbitRadiusAroundEarth);
 
-        let initialSatellitePosition = new Vector2(0, moonOrbitRadius);
-        initialSatellitePosition.rotateInPlaceBy(orbitAngle);
-
+        let initialSatellitePosition = new Vector2(0, moonOrbitRadiusAroundEarth);
         let initialSatelliteVelocity = new Vector2(moonOrbitalSpeed, 0);
-        initialSatelliteVelocity.rotateInPlaceBy(orbitAngle);
 
-        bodies.push(new Body(0.01, initialSatellitePosition, initialSatelliteVelocity));
-    }*/
+        bodies.push(new Body(0.001, initialSatellitePosition, initialSatelliteVelocity, body, 4));
+    }
 }
 
-// EARTH
-/*let earthOrbitRadius = 300;
-let earthOrbitalSpeed = getCircularOrbitalSpeed(sunMass, earthOrbitRadius);
-let earthMass = 2000;
-bodies.push(new Body(earthMass, new Vector2(0, earthOrbitRadius), new Vector2(earthOrbitalSpeed, 0), "blue"));
-*/
-// MOON
-/*let moonOrbitRadiusAroundEarth = 10;
-let moonOrbitRadius = earthOrbitRadius + moonOrbitRadiusAroundEarth;
-let moonOrbitalSpeed = earthOrbitalSpeed + getCircularOrbitalSpeed(earthMass, moonOrbitRadiusAroundEarth);
-bodies.push(new Body(0.01, new Vector2(0, moonOrbitRadius), new Vector2(moonOrbitalSpeed, 0), "grey"));
-*/
 let relativeIndex = 0;
 
 function render() {
@@ -80,8 +61,10 @@ function render() {
 
 function update() {
     let accs: Vector2[] = [];
+    let now = Date.now();
     for (let body of bodies) {
         let totalAcc = new Vector2(0, 0);
+
         for (let otherBody of bodies) {
             if (otherBody.id == body.id) continue;
             let d2 = Vector2.DistanceSquared(body.position, otherBody.position);
@@ -91,6 +74,7 @@ function update() {
         }
         accs.push(totalAcc);
     }
+    console.log(Date.now() - now);
     for (const [i, body] of bodies.entries()) body.update(accs[i]);
     render();
     requestAnimationFrame(update)

@@ -1,7 +1,6 @@
 import {Vector2} from "./vector2";
 import {center} from "./index";
-
-let colors = ["red", "cyan", "green", "gray", "white", "purple", "brown", "teal"];
+import {getRandomInt, isInCanvas, randomRadian} from "./utils";
 
 export class Body {
     id: number;
@@ -9,17 +8,33 @@ export class Body {
     position: Vector2;
     positionHistory: Vector2[] = [];
     velocity: Vector2;
+    parent: Body | null;
     private readonly color: string;
     private static bodyCounter = 0;
+    private pointSize: number;
 
-    public constructor(mass: number, initialPosition: Vector2, initialVelocity: Vector2, color?: string) {
+    public constructor(mass: number, initialPosition: Vector2, initialVelocity: Vector2, parent: Body | null, pointSize?: number, color?: string) {
         this.id = Body.bodyCounter;
         Body.bodyCounter++;
 
         this.mass = mass;
         this.position = initialPosition;
         this.velocity = initialVelocity;
-        this.color = color ? color : colors[Math.floor(Math.random() * colors.length)];
+
+        let orbitAngle = randomRadian();
+        this.position.rotateInPlaceBy(orbitAngle);
+        this.velocity.rotateInPlaceBy(orbitAngle);
+
+        if (parent != null) {
+            this.position.addInPlace(parent.position);
+            this.velocity.addInPlace(parent.velocity);
+        }
+
+        this.parent = parent;
+        this.pointSize = pointSize ? pointSize : 10;
+
+        this.color = color ? color : `rgb(${getRandomInt(50, 255)}, ${getRandomInt(50, 255)}, ${getRandomInt(50, 255)})`
+
     }
 
     public update(acceleration: Vector2) {
@@ -29,16 +44,17 @@ export class Body {
     }
 
     public draw(renderCtx: CanvasRenderingContext2D, traceCtx: CanvasRenderingContext2D, relativePosition: Vector2) {
+        if(!isInCanvas(this.position.subtract(relativePosition).add(center))) return;
         renderCtx.fillStyle = this.color;
         traceCtx.fillStyle = this.color;
         if (this.positionHistory.length > 0) {
             let position = this.positionHistory[this.positionHistory.length - 1];
             traceCtx.beginPath();
-            traceCtx.arc(position.x - relativePosition.x + center.x, position.y - relativePosition.y + center.y, 2, 0, 6.28);
+            traceCtx.arc(position.x - relativePosition.x + center.x, position.y - relativePosition.y + center.y, Math.min(this.pointSize / 3, 3), 0, 6.28);
             traceCtx.closePath();
         }
         renderCtx.beginPath();
-        renderCtx.arc(this.position.x - relativePosition.x + center.x, this.position.y - relativePosition.y + center.y, 5 + Math.log10(1 + 100*this.mass), 0, 6.28);
+        renderCtx.arc(this.position.x - relativePosition.x + center.x, this.position.y - relativePosition.y + center.y, this.pointSize, 0, 6.28);
         renderCtx.closePath();
     }
 }
