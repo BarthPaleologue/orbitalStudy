@@ -9,7 +9,10 @@ const isProduction = process.env.NODE_ENV === 'production';
 
 
 const config = {
-    entry: './src/index.ts',
+    entry: {
+        newton:'./src/newton/indexNewton.ts',
+        kepler:'./src/kepler/indexKepler.ts',
+    },
     output: {
         path: path.resolve(__dirname, 'dist'),
     },
@@ -19,7 +22,14 @@ const config = {
     },
     plugins: [
         new HtmlWebpackPlugin({
-            template: 'index.html',
+            template: 'newton.html',
+            filename: 'newton.html',
+            chunks: ["newton"]
+        }),
+        new HtmlWebpackPlugin({
+            template: "kepler.html",
+            filename: "kepler.html",
+            chunks: ["kepler"]
         }),
 
         new MiniCssExtractPlugin(),

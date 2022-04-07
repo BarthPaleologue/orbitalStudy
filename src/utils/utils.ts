@@ -1,8 +1,12 @@
-import {CANVAS_HEIGHT, CANVAS_WIDTH, G} from "./index";
 import {Vector2} from "./vector2";
 
+export const G = 0.0005;
+export const CANVAS_WIDTH = window.innerWidth;
+export const CANVAS_HEIGHT = window.innerHeight;
+export const center = new Vector2(CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2);
+
 export function getRandomInt(a: number, b: number) {
-    return Math.floor(Math.random()*(b-a)+a);
+    return Math.floor(Math.random() * (b - a) + a);
 }
 
 export function randomRadian() {

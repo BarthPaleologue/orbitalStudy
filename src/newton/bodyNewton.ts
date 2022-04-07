@@ -1,21 +1,20 @@
-import {Vector2} from "./vector2";
-import {center} from "./index";
-import {getRandomInt, isInCanvas, randomRadian} from "./utils";
+import {Vector2} from "../utils/vector2";
+import {center, getRandomInt, isInCanvas, randomRadian} from "../utils/utils";
 
-export class Body {
+export class BodyNewton {
     id: number;
     mass: number;
     position: Vector2;
     positionHistory: Vector2[] = [];
     velocity: Vector2;
-    parent: Body | null;
+    parent: BodyNewton | null;
     private readonly color: string;
     private static bodyCounter = 0;
     private pointSize: number;
 
-    public constructor(mass: number, initialPosition: Vector2, initialVelocity: Vector2, parent: Body | null, pointSize?: number, color?: string) {
-        this.id = Body.bodyCounter;
-        Body.bodyCounter++;
+    public constructor(mass: number, initialPosition: Vector2, initialVelocity: Vector2, parent: BodyNewton | null, pointSize?: number, color?: string) {
+        this.id = BodyNewton.bodyCounter;
+        BodyNewton.bodyCounter++;
 
         this.mass = mass;
         this.position = initialPosition;
