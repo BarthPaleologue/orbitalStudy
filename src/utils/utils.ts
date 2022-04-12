@@ -19,6 +19,10 @@ export function nrand(mean: number, std: number): number {
     return mean + std * Math.sqrt(-2 * Math.log(Math.random())) * Math.cos(2 * Math.PI * Math.random());
 }
 
+export function clampedNRand(mean: number, std: number, min: number, max: number) {
+    return Math.min(Math.max(nrand(mean, std), min), max);
+}
+
 export function getCircularOrbitalSpeed(parentMass: number, orbitRadius: number) {
     return Math.sqrt(G * parentMass / orbitRadius);
 }

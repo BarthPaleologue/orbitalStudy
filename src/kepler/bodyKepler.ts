@@ -1,36 +1,49 @@
 import {Vector2} from "../utils/vector2";
 import {center, getRandomInt, isInCanvas, randomRadian} from "../utils/utils";
+import {computePointOnOrbit} from "../utils/keplerUtils";
 
 export class BodyKepler {
     id: number;
     position: Vector2;
+    periapsis: number;
+    apoapsis: number;
+    orbitalPeriod: number;
+    orbitAngle: number;
     positionHistory: Vector2[] = [];
     parent: BodyKepler | null;
     private readonly color: string;
     private static bodyCounter = 0;
     private pointSize: number;
 
-    public constructor(initialPosition: Vector2, initialVelocity: Vector2, parent: BodyKepler | null, pointSize?: number, color?: string) {
+    public constructor(orbitalPeriod: number, periapsis: number, apoapsis: number, parent: BodyKepler | null, pointSize?: number, color?: string) {
         this.id = BodyKepler.bodyCounter;
         BodyKepler.bodyCounter++;
 
-        this.position = initialPosition;
+        this.orbitalPeriod = orbitalPeriod;
+        this.periapsis = periapsis;
+        this.apoapsis = apoapsis;
 
-        let orbitAngle = randomRadian();
-        this.position.rotateInPlaceBy(orbitAngle);
-
-        if (parent != null) {
-            this.position.addInPlace(parent.position);
-        }
+        this.position = new Vector2(0,0);
 
         this.parent = parent;
         this.pointSize = pointSize ? pointSize : 10;
 
         this.color = color ? color : `rgb(${getRandomInt(50, 255)}, ${getRandomInt(50, 255)}, ${getRandomInt(50, 255)})`
 
+        this.orbitAngle = randomRadian();
     }
 
-    public update(acceleration: Vector2) {
+    public update(t: number) {
+        let centerOfMass = new Vector2(0, 0);
+        if(this.parent != null) centerOfMass = this.parent.position;
+        this.position = computePointOnOrbit(centerOfMass, this.periapsis, this.apoapsis, t);
+
+        // 3D generalisation : go from here
+        let relativePosition = this.position.subtract(centerOfMass);
+        relativePosition.rotateInPlaceBy(this.orbitAngle);
+
+        this.position = relativePosition.add(centerOfMass);
+
         this.positionHistory.push(this.position.clone());
     }
 

@@ -1,6 +1,7 @@
 // from https://www.youtube.com/watch?v=UXD97l7ZT0w
 
 import {Vector2} from "./vector2";
+import {G} from "./utils";
 
 /**
  * Returns 0 when the arguments are solution to the Kepler's equation
@@ -14,7 +15,7 @@ export function keplerEquation(E: number, M: number, e: number) {
 
 export function solveKepler(M: number, e: number) {
     const h = 1e-4;
-    const epsilon = 1e-8;
+    const epsilon = 1e-6;
     let guess = M;
     const maxIterations = 100;
     for (let i = 0; i < maxIterations; i++) {
@@ -44,4 +45,9 @@ export function computePointOnOrbit(centerOfMass: Vector2, periapsis: number, ap
     let pointY = Math.sin(eccentricAnomaly) * semiMinorLength + ellipseCenterY;
 
     return new Vector2(pointX, pointY);
+}
+
+export function getOrbitalPeriodFromOrbit(periapsis: number, apoapsis: number, bodyMass: number, parentMass: number) {
+    let a = (apoapsis + periapsis) / 2;
+    return 2 * Math.PI * a * Math.sqrt(a / (G * (bodyMass + parentMass)));
 }

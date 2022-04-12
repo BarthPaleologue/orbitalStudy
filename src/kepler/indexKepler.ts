@@ -1,6 +1,13 @@
 import {BodyKepler} from "./bodyKepler";
 import {Vector2} from "../utils/vector2";
-import {CANVAS_HEIGHT, CANVAS_WIDTH, getCircularOrbitalSpeed, getRandomInt, nrand, randomRadian} from "../utils/utils";
+import {
+    CANVAS_HEIGHT,
+    CANVAS_WIDTH,
+    clampedNRand,
+    getRandomInt,
+    nrand,
+} from "../utils/utils";
+import {getOrbitalPeriodFromOrbit} from "../utils/keplerUtils";
 
 let renderCanvas = document.getElementById("renderCanvas") as HTMLCanvasElement;
 renderCanvas.width = CANVAS_WIDTH;
@@ -16,31 +23,30 @@ let traceCtx = traceCanvas.getContext("2d");
 let bodies: BodyKepler[] = [];
 
 // SUN
-let sunMass = 2000000;
-let sun = new BodyKepler(new Vector2(0, 0), new Vector2(0, 0), null,20,"yellow");
+let sunMass = 1e10;
+let sun = new BodyKepler(10, 10,20, null,20,"yellow");
 bodies.push(sun);
 
-for(let i = 1; i < getRandomInt(3, 5); i++) {
-    let orbitRadius = 100 * i * nrand(1, 0.1);
-    let orbitalSpeed = getCircularOrbitalSpeed(sunMass, orbitRadius) * nrand(1, 0.1);
-    let mass = 20000 * nrand(1, 0.2);
-
-    let initialPosition = new Vector2(0, orbitRadius);
-    let initialVelocity = new Vector2(orbitalSpeed, 0);
-
-    let body = new BodyKepler(initialPosition, initialVelocity, sun, 7);
+for(let i = 1; i < getRandomInt(3, 7); i++) {
+    let dist = i * clampedNRand(90, 10, 70, 110);
+    let periapsis = dist * clampedNRand(0.9, 0.1, 0.5, 1.0);
+    let apoapsis = dist * clampedNRand(1.1, 0.1, 1.0, 1.7);
+    let mass = 1e9 * nrand(1, 0.2);
+    let orbitalPeriod = getOrbitalPeriodFromOrbit(periapsis, apoapsis, mass, sunMass);
+    let body = new BodyKepler(orbitalPeriod, periapsis, apoapsis, sun, 10);
     bodies.push(body);
 
-    for(let i = 0; i < 1; i++) {
-        let moonOrbitRadiusAroundEarth = 10 * nrand(1, 0.1);
-        let moonOrbitalSpeed = getCircularOrbitalSpeed(mass, moonOrbitRadiusAroundEarth);
-
-        let initialSatellitePosition = new Vector2(0, moonOrbitRadiusAroundEarth);
-        let initialSatelliteVelocity = new Vector2(moonOrbitalSpeed, 0);
-
-        bodies.push(new BodyKepler(initialSatellitePosition, initialSatelliteVelocity, body, 4));
+    for(let j = 1; j < getRandomInt(1, 4); j++) {
+        let satelliteMass = 1e5;
+        let dist2 = j * clampedNRand(15, 1, 10, 20);
+        let periapsis2 = dist2 * clampedNRand(0.9, 0.05, 0.5, 1.0);
+        let apoapsis2 = dist2 * clampedNRand(1.1, 0.05, 1.0, 1.5);
+        let orbitalPeriod2 = getOrbitalPeriodFromOrbit(periapsis2, apoapsis2, satelliteMass, mass);
+        let satellite = new BodyKepler(orbitalPeriod2, periapsis2, apoapsis2, body, 5);
+        bodies.push(satellite);
     }
 }
+console.table(bodies)
 
 let relativeIndex = 0;
 
@@ -54,33 +60,24 @@ function render() {
 }
 
 function update() {
-    let accs: Vector2[] = [];
-    for (let body of bodies) {
 
+    let t = Date.now() / 1000;
+
+    for(const body of bodies) {
+        body.update(t / body.orbitalPeriod);
     }
+
     render();
     requestAnimationFrame(update)
 }
 
 requestAnimationFrame(update);
 
+
+
 document.addEventListener("keydown", e => {
-    switch (e.key) {
-        case "0":
-            relativeIndex = 0;
-            traceCtx.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
-            break;
-        case "1":
-            relativeIndex = 1;
-            traceCtx.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
-            break;
-        case "2":
-            relativeIndex = 2;
-            traceCtx.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
-            break;
-        case ".":
-            relativeIndex = -1;
-            traceCtx.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
-            break;
+    if(!isNaN(Number(e.key))) {
+        relativeIndex = Number(e.key);
+        traceCtx.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
     }
 })
