@@ -29,8 +29,8 @@ bodies.push(sun);
 
 for(let i = 1; i < getRandomInt(3, 7); i++) {
     let dist = i * clampedNRand(90, 10, 70, 110);
-    let periapsis = dist * clampedNRand(0.9, 0.1, 0.5, 1.0);
-    let apoapsis = dist * clampedNRand(1.1, 0.1, 1.0, 1.7);
+    let periapsis = dist * clampedNRand(0.9, 0.1, 0.75, 1.0);
+    let apoapsis = dist * clampedNRand(1.1, 0.1, 1.0, 1.3);
     let mass = 1e9 * nrand(1, 0.2);
     let orbitalPeriod = getOrbitalPeriodFromOrbit(periapsis, apoapsis, mass, sunMass);
     let body = new BodyKepler(orbitalPeriod, periapsis, apoapsis, sun, 10);
