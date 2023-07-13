@@ -10,6 +10,8 @@ The goal is to create a simple algorithm to create procedural solar systems impl
 
 ## Newton
 
+Online demo here: https://barthpaleologue.github.io/orbitalStudy/dist/newton.html
+
 In this simple simulator we create physical bodies around a central sun, and give them tangential velocity to give them near circular orbits :
 
 <img src="https://render.githubusercontent.com/render/math?math=v = \sqrt{ \frac{GM}{r} }">
@@ -23,6 +25,8 @@ And then we apply Newton's second law to make them move :
 Yet it comes with a few drawbacks : orbits with a lot of bodies are very unstable and you have to run the entire simulation to know the position of a body at a time t. So we have to try something else.
 
 ## Kepler
+
+Online demo here: https://barthpaleologue.github.io/orbitalStudy/dist/kepler.html
 
 We are trying to solve this equation describing the orbit of a body :
 
